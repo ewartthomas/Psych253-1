@@ -1,4 +1,4 @@
-Statistical Methods for Behavioral and Social Sciences
+Statistical Theory, Models, and Methodology
 ======================================================
 
 .. image:: images/pic1.png
@@ -14,15 +14,15 @@ Statistical Methods for Behavioral and Social Sciences
    :alt: alternate text
    :target: http://spark.rstudio.com/supsych/logistic_regression/
 
-Instructors:	  	  
+Instructor:	  	  
 ~~~~~~~~~~~~
 
-Ewart Thomas, Benoît Monin
+Ewart Thomas
 
-2014 Teaching Assistants:
+2015 Teaching Assistants:
 ~~~~~~~~~~~~~~~~~~~~
 
-Rebecca Carey, Caitie Handron, Kara Weisman
+Steph Gagnon & Dan Hawthorne
 
 Contents
 --------
@@ -37,5 +37,4 @@ Contents
    tutorials/index.rst
    cheatsheets/index.rst
    section/index.rst
-   section_2013/index.rst
    
