@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Example Applications &mdash; Psych 252 Fall 2014 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootswatch-3.1.0/journal/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     'Fall 2014',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-3.1.0/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="Psych 252 Fall 2014 documentation" href="../index.html" />
+    <link rel="next" title="Course Tutorials" href="../tutorials/index.html" />
+    <link rel="prev" title="Plotting Examples" href="../plots/index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body>
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html">
+          Psych 252</a>
+        <span class="navbar-text navbar-version pull-left"><b>Fall 2014</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            <li class="divider-vertical"></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../data/index.html">Course Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../slides/index.html">Slides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../plots/index.html">Plotting Examples</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Example Applications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Course Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cheatsheets/index.html">Cheat sheets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../section/index.html">2014 Section Resources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../section_2013/index.html">2013 Section Resources</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">Example Applications</a><ul>
+<li><a class="reference internal" href="#sampling-and-standard-error">Sampling and standard error</a></li>
+<li><a class="reference internal" href="#simulating-t-tests">Simulating t tests</a></li>
+<li><a class="reference internal" href="#simple-linear-regression">Simple linear regression</a></li>
+<li><a class="reference internal" href="#simple-logistic-regression">Simple logistic regression</a></li>
+<li><a class="reference internal" href="#regression-uncertainty">Regression uncertainty</a></li>
+<li><a class="reference internal" href="#modeling-choices-in-multiple-regression">Modeling choices in multiple regression</a></li>
+<li><a class="reference internal" href="#multicollinearity-in-multiple-regression">Multicollinearity in multiple regression</a></li>
+<li><a class="reference internal" href="#simple-mediation-structure">Simple mediation structure</a></li>
+<li><a class="reference internal" href="#signal-detection-theory">Signal Detection Theory</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      
+  <div class="section" id="example-applications">
+<h1>Example Applications<a class="headerlink" href="#example-applications" title="Permalink to this headline">¶</a></h1>
+<p>This is a collection of web apps built using <a class="reference external" href="http://www.rstudio.com/shiny/">Shiny</a> to illustrate and help build intuitions about
+some statistical concepts.</p>
+<p>Compiled by Steph Gagnon, Michael Waskom, and Lauren Howe</p>
+<div class="section" id="sampling-and-standard-error">
+<h2>Sampling and standard error<a class="headerlink" href="#sampling-and-standard-error" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="http://spark.rstudio.com/supsych/sampling_and_stderr/">Link to app</a></p>
+<p>This example demonstrates the relationship between the standard deviation of a
+population, the standard deviation and standard error of the mean for a sample
+drawn from that population, and the expected distribution of means that we would
+obtain if we took many samples (of the same size) from the population. It is
+meant to emphasize how the standard error of the mean, as calculated from the
+sample statistics for a single sample, corresponds to the width of the expected
+distribution of means (under normal assumptions).</p>
+</div>
+<div class="section" id="simulating-t-tests">
+<h2>Simulating t tests<a class="headerlink" href="#simulating-t-tests" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="http://spark.rstudio.com/supsych/ttest_simulation/">Link to app</a></p>
+<p>This example performs 1000 one-sample t tests (with different samples from the
+same distribution) and plots the resulting histograms of t statistics and p
+values. It is possible to control both the true effect size (Cohen&#8217;s D) and the
+number of observations in a sample to show how these two parameters relate the
+expected distribution of scores. When the effect size is 0, the simulation
+shows what happens when the null hypothesis is true.</p>
+</div>
+<div class="section" id="simple-linear-regression">
+<h2>Simple linear regression<a class="headerlink" href="#simple-linear-regression" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="http://spark.rstudio.com/supsych/simple_regression/">Link to app</a></p>
+<p>This example demonstrates the key objective of linear regression: finding the
+coefficients for a linear model that minimize the squared distance from each
+observation to the prediction made by the model at the same value of x.</p>
+</div>
+<div class="section" id="simple-logistic-regression">
+<h2>Simple logistic regression<a class="headerlink" href="#simple-logistic-regression" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="http://spark.rstudio.com/supsych/logistic_regression/">Link to app</a></p>
+<p>Similar to the linear regression example, this app shows how the goal of
+logistic regression is to find a model (expressed in linear coefficients &#8211;
+here just the intercept and a slope term) that maximizes the likelihood of the
+data you are fitting the model to.</p>
+</div>
+<div class="section" id="regression-uncertainty">
+<h2>Regression uncertainty<a class="headerlink" href="#regression-uncertainty" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="http://spark.rstudio.com/supsych/regression_bootstrap/">Link to app</a></p>
+<p>This app plots a simple linear regression and allows the user to visualize the
+distribution of regression estimates from bootstrap resamples of the dataset.
+The user can also plot a normal density with mean at y-hat and standard
+deviation equal to the standard error of the regression estimate at that point.
+The app thus draws a comparison between the bootstrap procedure, the expected
+sampling characteristics of the regression line, and a common way of
+visualizing the uncertainty of a regression.</p>
+</div>
+<div class="section" id="modeling-choices-in-multiple-regression">
+<h2>Modeling choices in multiple regression<a class="headerlink" href="#modeling-choices-in-multiple-regression" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="http://spark.rstudio.com/supsych/multi_regression/">Link to app</a></p>
+<p>This app plots a basic multiple regression with two variables: x, a continuous
+measure, and group, a categorical measure. The app lets the user choose whether
+to fit a simple regression, an additive multiple regression, or an interactive
+multiple regression, and it shows the <tt class="docutils literal"><span class="pre">lm()</span></tt> output and a visualization for
+each choice. The app also lets the user control the true effect size for each
+component of the data to help build intuition about the visual and statistical
+consequences of different relationships between variables in a multiple
+regression.</p>
+</div>
+<div class="section" id="multicollinearity-in-multiple-regression">
+<h2>Multicollinearity in multiple regression<a class="headerlink" href="#multicollinearity-in-multiple-regression" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="http://spark.rstudio.com/supsych/collinearity/">Link to app</a></p>
+<p>This app shows what happens to multiple regression results when there is
+considerable covariance between two contiunous predictor variables. Although
+the overall model fit does not change as the covariance is increased (as
+visualized by the regression of y onto yhat and the R squared in the model
+summary), the parameter estimates become unstable and the confidence intervals
+expand, which yields large p values even though the relationship between the
+predictors and the response variable does not change.</p>
+</div>
+<div class="section" id="simple-mediation-structure">
+<h2>Simple mediation structure<a class="headerlink" href="#simple-mediation-structure" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="http://spark.rstudio.com/supsych/mediation/">Link to app</a></p>
+<p>This app is intended to provide some intuition about simple mediation models.
+It allows you to specify a range of causal structures by changing the strength
+(and direction) of the relationships between three variables. Once you have
+constructed a structure, you can observe the effects of manipulating the
+system. Finally, you can simulate data from a model with the specified
+structure and observe how changing the strength of the relationships influences
+the regression parameters and inferential statistics.</p>
+</div>
+<div class="section" id="signal-detection-theory">
+<h2>Signal Detection Theory<a class="headerlink" href="#signal-detection-theory" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="http://spark.rstudio.com/supsych/sdt_concept/">Conceptual illustration</a> /
+<a class="reference external" href="http://spark.rstudio.com/supsych/sdt_expt/">Calculations from data</a></p>
+<p>These applications illustrate the relationship between hit rate, false alarm rate,
+dprime, and criterion.</p>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+<div id="sourcelink">
+  <a href="../_sources/apps/index.txt"
+     rel="nofollow">Source</a>
+</div>
+      
+    </p>
+    <p>
+        &copy; Copyright 2014, Steph Gagnon, Lauren Howe &amp; Michael Waskom.<br/>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2.2.<br/>
+    </p>
+  </div>
+</footer>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-33051211-2', 'auto');
+  ga('send', 'pageview');
+</script>
+
+  </body>
+</html>

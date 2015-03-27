@@ -1,0 +1,176 @@
+Psych 252 Review
+========================================================
+
+Here we will analyze data from a study of 2287 eighth-grade pupils (aged about 11) in 132 classes in 131 schools in the Netherlands. 
+
+The variables in the dataframe are:
+- `lang`: language test score
+- `IQ`: verbal IQ
+- `class`: class ID
+- `GS`: class size (number of eighth-grade pupils recorded in the class (there may be others see COMB, and some may have been omitted with missing values)
+- `SES`: social-economic status of pupil's family
+- `COMB`: were the pupils taught in a multi-grade class (0/1)? Classes which contained pupils from grades 7 and 8 are coded 1, but only eighth-graders were tested
+
+Load in the data
+----------------------
+```{r}
+library(ggplot2)
+library(MASS)
+data(nlschools)
+data(n) # use tab-complete to see details
+df = data.frame(nlschools)
+str(df)
+```
+When you're loading in the dataset, make sure you check to see if everything is factored appropriately, etc.! This is especially important if your "Subject ID" variable starts with a number; `R` will interpret it as a numeric value by default, which can lead to problems!
+
+
+Take a quick look at relationships between some variables:
+----------------------
+```{r}
+df_corr = data.frame(cbind(df$lang, df$IQ, df$SES, df$GS))
+colnames(df_corr) = c("langScore", "IQ", "SES", "classSize")
+z <- cor(df_corr)
+
+require(lattice)
+levelplot(z, panel = panel.levelplot.raster, par.settings = list(regions = list(col = heat.colors(100))))
+```
+
+Now, let's ask some questions, and examine them using our tools from stats!:
+----------------------
+
+### Does IQ predict language test score?
+We might predict that better IQ leads to better test scores overall.
+
+```{r}
+library(lme4)
+rs0 = lm(lang ~ scale(IQ, scale=FALSE), data = df)
+summary(rs0)
+rs1 = lmer(lang ~ scale(IQ, scale=FALSE) + (1|class), data = df)
+summary(rs1)
+rs2 = lmer(lang ~ scale(IQ, scale=FALSE) + (1 + IQ |class), data = df)
+
+# test models..
+anova(rs0, rs1)
+anova(rs1, rs2)
+
+# or manually!
+dev1 = -2*as.numeric(logLik(rs0))
+dev2 = -2*as.numeric(logLik(rs1))
+
+# get chisq p-stat (since diff in deviance has chi-sq distribution)
+diff = dev1-dev2; diff
+4 - length(rs0$coefficients)
+pchisq(diff, df=2, lower.tail=FALSE)
+
+summary(rs2)
+coef(rs2)
+```
+
+### Does IQ predict language test score, when controlling for SES?
+```{r}
+rs3 = lmer(lang ~ scale(IQ, scale=FALSE) + scale(SES, scale=FALSE) + (1 |class), data = df)
+summary(rs3)
+```
+
+### Is there an interaction between IQ and SES predicting language test score?
+```{r}
+with(df, coplot(lang ~ scale(IQ, scale = FALSE) | scale(SES, scale = FALSE), number = 3, rows = 1, overlap=0))
+
+with(df, coplot(lang ~ scale(SES, scale = FALSE) | scale(IQ, scale = FALSE), number = 3, rows = 1, overlap=0))
+
+
+rs3_inter = lmer(lang ~ scale(IQ) * scale(SES) + (1 |class), data = df)
+summary(rs3_inter)
+
+# Look into this interaction some more!
+# Simple slope at scale(SES) + 1SD
+rs3_hiSES = lmer(lang ~ scale(IQ) * I(scale(SES) - 1) + (1 |class), data = df)
+summary(rs3_hiSES)
+
+rs3_loSES = lmer(lang ~ scale(IQ) * I(scale(SES) + 1) + (1 |class), data = df)
+summary(rs3_loSES)
+
+ggplot(df, 
+       aes(x=scale(IQ), 
+           y=SES)) +  # Adding color
+  geom_point(shape=1) +  
+  theme_bw() + 
+  # effect of IQ @mean SES
+  geom_abline(aes(intercept=40.7814, slope=4.6214), colour='black') +
+  # effect of IQ on  @+1SD SES
+  geom_abline(aes(intercept=42.6243, slope=4.2792), colour='green') +
+  # effect of IQ on  @-1SD SES
+  geom_abline(aes(intercept=38.9386, slope=4.9637), colour='red')+
+  ggtitle('Interaction between SES and IQ on Language Test Scores')
+```
+What might you do to test if adding random effects for the slopes improves the model?
+
+
+### Does combined class predict language test score?
+```{r}
+df$COMB_fac = factor(df$COMB)
+levels(df$COMB_fac)
+
+rs4 = lmer(lang ~  COMB_fac + (1 |class), data = df)
+summary(rs4)
+
+contrasts(df$COMB_fac) = c(1, -1)
+#contrasts(df$COMB_fac) = c(-1, 1)
+#contrasts(df$COMB_fac) = c(0, 1)
+contrasts(df$COMB_fac)
+rs4_v2 = lmer(lang ~  COMB_fac + (1 |class), data = df)
+summary(rs4)
+
+plot(lang ~  COMB_fac, data=df)
+aggregate(lang ~ COMB_fac, data=df, mean)
+```
+
+### Are there similar numbers of students observed from each class?
+```{r}
+tb = table(df$class)
+tb
+chisq.test(tb)
+```
+
+### Were there similar numbers of students from combined/not combined classes?
+```{r}
+tb = table(df$COMB)
+tb
+chisq.test(tb)
+prop.table(tb)
+```
+
+### Does SES predict whether or not a student is in a combined class?
+```{r}
+rs_glm = glmer(COMB ~ scale(SES) + (1 | class), family='binomial', data = df)
+rs2_glm = glmer(COMB ~ scale(SES) + (1 + SES | class), family='binomial', data = df)
+anova(rs_glm, rs2_glm)
+summary(rs2_glm)
+```
+
+### SES as a categorical variable
+```{r}
+quantpf3 = quantile(df$SES, probs = c(0.34, 0.66))
+
+df$SEScat = findInterval(df$SES, quantpf3)
+df$SEScat  <- factor(df$SEScat , labels = c("LoSES", "MidSES", "HiSES"))
+table(df$SEScat)
+
+aggregate(SES ~ df$SEScat, data=df, mean)
+```
+
+### Is being in a combined class related to SES?
+```{r}
+tb = table(df$COMB, df$SEScat)
+tb
+chisq.test(tb)
+
+prop.table(tb)
+addmargins(tb)
+
+# % of kids in non-combined class by SES category
+316/467
+586/807
+756/1013
+```
+
