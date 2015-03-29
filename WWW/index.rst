@@ -1,18 +1,18 @@
 Statistical Theory, Models, and Methodology
 ======================================================
 
-.. image:: images/pic1.png
+.. image:: images/sdt.png
    :width: 30%
    :alt: alternate text
-   :target: http://spark.rstudio.com/supsych/simple_regression/
-.. image:: images/pic2.png
-   :width: 30%
-   :alt: alternate text
-   :target: http://spark.rstudio.com/supsych/sampling_and_stderr/
-.. image:: images/pic3.png
+   :target: http://stanford.edu/~sgagnon/teaching_apps/index.html
+.. image:: images/glm.png
    :width: 30%
    :alt: alternate text
    :target: http://spark.rstudio.com/supsych/logistic_regression/
+.. image:: images/sem.png
+   :width: 30%
+   :alt: alternate text
+   :target: http://en.wikipedia.org/wiki/Structural_equation_modeling
 
 Instructor:	  	  
 ~~~~~~~~~~~~

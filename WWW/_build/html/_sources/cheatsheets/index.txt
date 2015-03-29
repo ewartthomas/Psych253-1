@@ -4,7 +4,17 @@ Cheat sheets
 This is a collection of cheat sheets for basic concepts that may be
 helpful for the course.
 
-Created by Steph Gagnon, Michael Waskom, and Lauren Howe
+Created by Steph Gagnon, Dam Hawthorne, Michael Waskom, and Lauren Howe
+
+Calculating Cohen's :math:`\kappa` by hand
+----------------------------
+
+This PDF provides the equations to calculate Cohen's :math:`\kappa`, a measure of 
+reliability for qualitative data, by hand. In other words, this is a measure of 
+agreement corrected for chance. This example assumes that 2 raters provided 
+ratings for whether or not the category "family" was present in a written narrative 
+(i.e., ratings of "yes" or "no"). There were 43 narratives in total. 
+[`PDF <http://www.stanford.edu/class/psych253/tutorials/kappa.pdf>`_]
 
 
 Math behind Chi Square tests

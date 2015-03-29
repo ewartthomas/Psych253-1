@@ -1,28 +1,28 @@
-Statistical Methods for Behavioral and Social Sciences
+Statistical Theory, Models, and Methodology
 ======================================================
 
-.. image:: images/pic1.png
+.. image:: images/sdt.png
    :width: 30%
    :alt: alternate text
-   :target: http://spark.rstudio.com/supsych/simple_regression/
-.. image:: images/pic2.png
-   :width: 30%
-   :alt: alternate text
-   :target: http://spark.rstudio.com/supsych/sampling_and_stderr/
-.. image:: images/pic3.png
+   :target: http://stanford.edu/~sgagnon/teaching_apps/index.html
+.. image:: images/glm.png
    :width: 30%
    :alt: alternate text
    :target: http://spark.rstudio.com/supsych/logistic_regression/
+.. image:: images/sem.png
+   :width: 30%
+   :alt: alternate text
+   :target: http://en.wikipedia.org/wiki/Structural_equation_modeling
 
-Instructors:	  	  
+Instructor:	  	  
 ~~~~~~~~~~~~
 
-Ewart Thomas, Benoît Monin
+Ewart Thomas
 
-2014 Teaching Assistants:
+2015 Teaching Assistants:
 ~~~~~~~~~~~~~~~~~~~~
 
-Rebecca Carey, Caitie Handron, Kara Weisman
+Steph Gagnon & Dan Hawthorne
 
 Contents
 --------
@@ -37,5 +37,4 @@ Contents
    tutorials/index.rst
    cheatsheets/index.rst
    section/index.rst
-   section_2013/index.rst
    

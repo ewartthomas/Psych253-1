@@ -43,7 +43,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Psych 253'
-copyright = u'2015, Steph & Dan Hawthorne'
+copyright = u'2015, Steph Gagnon & Dan Hawthorne'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -102,7 +102,7 @@ html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
 # documentation.
 html_theme_options = {
     'source_link_position': "footer",
-    'bootswatch_theme': "sandstone",
+    'bootswatch_theme': "flatly",
     'navbar_sidebarrel': False,
     'navbar_class': "navbar navbar-inverse",
     'bootstrap_version': "3",
