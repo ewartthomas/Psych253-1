@@ -15,7 +15,7 @@ agreement corrected for chance. This example assumes that 2 raters provided
 ratings for whether or not the category "family" was present in a written narrative 
 (i.e., ratings of "yes" or "no"). There were 43 narratives in total. By convention, a 
 :math:`\kappa` of .2-.4 is ‘fair’, .4-.6 is ‘moderate’, and .6-.8 is ‘substantial’.
-[`PDF <http://www.stanford.edu/class/psych253/cheatsheets/kappa.pdf>`_]
+[`PDF <http://www.stanford.edu/class/psych253/cheatsheets/kappa_example.pdf>`_]
 
 
 Math behind Chi Square tests
