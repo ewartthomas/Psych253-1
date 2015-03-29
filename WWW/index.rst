@@ -13,16 +13,28 @@ Statistical Theory, Models, and Methodology
    :width: 30%
    :alt: alternate text
    :target: http://en.wikipedia.org/wiki/Structural_equation_modeling
+    
+This course will review the more familiar procedures covered in Psych 252, namely, 
+the general linear model (``lm {stats}`` in R), the generalised linear model 
+(``glm {stats}``), and linear mixed models (``lme {nlme}``, ``lmer {lme4}``). 
+Also, we will consider less familiar applications of these R functions, and more 
+‘advanced’ procedures, such as, reliability, factor analysis, penalized regression, 
+and structural equation modeling.
 
 Instructor:	  	  
 ~~~~~~~~~~~~
 
-Ewart Thomas
+Ewart Thomas (ethomas)
+	- Office Hours: Jordan 476, TTh 10 am
 
 2015 Teaching Assistants:
 ~~~~~~~~~~~~~~~~~~~~
 
-Steph Gagnon & Dan Hawthorne
+Steph Gagnon (sgagnon)
+	- Office Hours: Jordan 404, by appt
+
+Dan Hawthorne (djthorne)
+	- Office Hours: Jordan 330, by appt
 
 Contents
 --------
