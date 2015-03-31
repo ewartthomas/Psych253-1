@@ -44,7 +44,6 @@ Contents
 
    section/index.rst
    data/index.rst
-   code/index.rst
    slides/index.rst
    cheatsheets/index.rst
    plots/index.rst
