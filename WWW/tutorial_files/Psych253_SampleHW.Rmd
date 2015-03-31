@@ -1,0 +1,44 @@
+---
+title: 'FirstName LastName (Homework #1)'
+output:
+  html_document:
+    highlight: pygments
+    theme: flatly
+---
+
+Question 1
+-------------------------------------
+
+### Q1a)
+```{r 1a}
+summary(cars)
+```
+
+Write up for this question. Note that we included a chunk name when we defined the chunk above according to the question number and sub-part (i.e., {r 1a} names chunk 1a). This allows you to quickly jump to a specific chunk using the dropdown bar labeled "(Top Level)" at the bottom of the open .Rmd in RStudio.
+
+### Q1b)
+
+```{r 1b}
+res1 = lm(dist~speed, data=cars)
+summary(res1)
+```
+
+Note that you can include [LaTeX](http://web.ift.uib.no/Teori/KURS/WRK/TeX/symALL.html) math symbols (e.g., Greek letters like $\kappa$, or equations like $\frac{1}{2}$) by using dollar signs. If you use double dollar signs, the equation will go on a new line, like this: $$\frac{\chi}{\sigma}$$ 
+
+Also, you can automatically print R variables & output using back-tics. For instance, to show the coefficient for `speed` in the model above: `r res1$coefficients[2]`.
+
+Question 2
+-------------------------------------
+
+### Q2a)
+```{r 2a}
+summary(cars)
+```
+
+To add emphasis to text, you can use the asterixs. For instance, 2 will **bold ** the text, and 1 will *italicize* it. If you use back-tics, the text will be formatted like `code`.
+
+
+Good luck!
+
+
+

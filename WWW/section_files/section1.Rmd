@@ -211,7 +211,20 @@ qplot(extent.1, extent.2, data = d2,
       geom = c("point", "smooth"), method="lm") +theme_bw()
 ```
 
+### Calculate $\kappa$ using a Cognitive Model (HW1 #4)
+```{r}
+# Load in appropriate functions
+source("http://stanford.edu/class/psych253/code/skapreliab2.r")
 
+dat0 = c(96,2,2,0) #EDIT THIS to contain the frequencies from the table in the problem
+cat(dat0, "\n Cohens kappa", kappa0(dat0), "\n")
+
+cat("\n Parameter estimates from (i) original data, (ii) the bootstrap \n\n") 
+print(param.boot3(dat0, 1000))
+
+cat("\n Parameter estimates using Bayesian model and MCMC \n\n") 
+print(param.mcmc1(dat0, 1000))
+```
 
 Cronbach's $\alpha$
 ------------------------------
