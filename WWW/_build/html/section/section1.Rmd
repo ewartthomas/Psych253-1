@@ -1,0 +1,16 @@
+---
+title: 'Section 1: Reliability'
+output:
+  html_document:
+    highlight: pygments
+    theme: flatly
+---
+
+![Alt text](/path/to/img.jpg)
+
+
+Cohen's $\kappa$
+------------------------------
+```{r}
+summary(cars)
+```
