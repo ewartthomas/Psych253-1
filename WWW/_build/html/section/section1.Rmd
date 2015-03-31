@@ -6,11 +6,82 @@ output:
     theme: flatly
 ---
 
-![Alt text](/path/to/img.jpg)
+It is often important to determine the reliability of a novel index. For instance, if you have some new RAs working in your lab coding images (e.g., judging the positive valence of each image), you probably want to determine the reliability of the raters, or in other words, the agreement between raters. Depending on the index you are using, there are several measure of reliability. Let's explore these different measures!
+
+
+Which type of reliability?
+------------------------------
+<img src="http://stanford.edu/class/psych253/section/reliability_chart.png" alt="reliability chart" width="50%">
 
 
 Cohen's $\kappa$
 ------------------------------
+In our example (from Markus, Ryff, Curhan & Palmersheim’s study of “Well-Being”), **participants answer 32 questions**. Let us focus on coding the narrative answer to just 1 question, “What does it mean to you to have a good life?”; **43 participants answered this question** in total. The researchers determined a number of **categories** (e.g., relations with others, health, family, enjoyment), and the RAs were tasked with coding each participant's narrative based on whether that narrative included a given category ("yes" = 1) or did not ("no" = 0). Let's determine the reliability of 2 RAs' coding of the category "relations with others." 
+
+### Create table of counts
 ```{r}
-summary(cars)
+ratings <- matrix(c(20, 4, 8, 11),ncol=2,byrow=TRUE)
+colnames(ratings) <- c("rater2_n", "rater2_y")
+rownames(ratings) <- c("rater1_n", "rater1_y")
+ratings <- as.table(ratings)
+
+# Display table with margins (row/col sums)
+addmargins(ratings)
 ```
+
+### Calculate agreement between raters
+```{r}
+agree = sum(diag(ratings))
+
+# total number of raters
+n = margin.table(ratings)
+
+# percent agreement
+agree_percent = agree/n
+cat('Percent agreement:', agree_percent)
+```
+
+The percent agreement between raters is `r agree_percent`.
+
+
+### Calculate level of agreement due to chance
+```{r}
+calc_chance = function(num_raters, table) {
+  
+  # Calculate total
+  n = margin.table(table)
+  
+  # Add margins to the table
+  marg = addmargins(table)
+
+  temp = NULL
+  for (i in 1:num_raters) {
+    # (% time rater 1 said i * % time rater 2 
+    # said i = probability both would say i overall)
+    temp[i] = (marg[i, num_raters + 1]/n) * (marg[num_raters + 1, i]/n)
+    }
+  return(sum(temp))
+}
+
+chance_percent = calc_chance(2, ratings)
+```
+
+The percent agreement due to chance is `r chance_percent`.
+
+### Calculate Cohen's $\kappa$
+```{r}
+calc_kappa = function(agree_percent, chance_percent){
+  kappa = (agree_percent - chance_percent)/(1-chance_percent)
+  return(kappa)
+}
+
+kappa = calc_kappa(agree_percent, chance_percent)
+```
+
+The reliability of the two raters is `r kappa`.
+
+
+Cronbach's $\alpha$
+------------------------------
+
+

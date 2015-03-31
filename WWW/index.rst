@@ -42,11 +42,11 @@ Contents
 .. toctree::
    :maxdepth: 1
 
+   section/index.rst
    data/index.rst
    slides/index.rst
+   cheatsheets/index.rst
    plots/index.rst
    apps/index.rst
    tutorials/index.rst
-   cheatsheets/index.rst
-   section/index.rst
    
