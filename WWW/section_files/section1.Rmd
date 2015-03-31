@@ -16,7 +16,7 @@ Which type of reliability?
 
 Cohen's $\kappa$
 ------------------------------
-In our example (from Markus, Ryff, Curhan & Palmersheim’s study of “Well-Being”), **participants answer 32 questions**. Let us focus on coding the narrative answer to just 1 question, “What does it mean to you to have a good life?”; **43 participants answered this question** in total. The researchers determined a number of **categories** (e.g., relations with others, health, family, enjoyment), and the RAs were tasked with coding each participant's narrative based on whether that narrative included a given category ("yes" = 1) or did not ("no" = 0). Let's determine the reliability of 2 RAs' coding of the category "relations with others." 
+In our example (from Markus, Ryff, Curhan & Palmersheim’s study of “Well-Being”), **participants answer 32 questions**. Let us focus on coding the narrative answer to just 1 question, “What does it mean to you to have a good life?”; **43 participants answered this question** in total. The researchers determined a number of **categories** (e.g., relations with others, health, family, enjoyment), and the RAs were tasked with coding each participant's narrative based on whether that narrative included a given category ("yes" = 1) or did not ("no" = 0). Let's determine the reliability of 2 RAs' coding of the category "relations with others." That is, let us determine the agreement between raters. 
 
 ### Create table of counts
 ```{r}
@@ -83,5 +83,4 @@ The reliability of the two raters is `r kappa`.
 
 Cronbach's $\alpha$
 ------------------------------
-
 

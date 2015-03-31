@@ -19,7 +19,7 @@ the general linear model (``lm {stats}`` in R), the generalised linear model
 (``glm {stats}``), and linear mixed models (``lme {nlme}``, ``lmer {lme4}``). 
 Also, we will consider less familiar applications of these R functions, and more 
 ‘advanced’ procedures, such as, reliability, factor analysis, penalized regression, 
-and structural equation modeling.
+and structural equation modeling. [`Syllabus <http://www.stanford.edu/class/psych253/slides/253syll.pdf>`_]
 
 Instructor:	  	  
 ~~~~~~~~~~~~
@@ -44,9 +44,11 @@ Contents
 
    section/index.rst
    data/index.rst
+   code/index.rst
    slides/index.rst
    cheatsheets/index.rst
    plots/index.rst
    apps/index.rst
    tutorials/index.rst
+   
    

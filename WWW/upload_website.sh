@@ -16,4 +16,5 @@ cp section_files/* _build/html/section/
 cp slides_files/* _build/html/slides/
 cp plot_files/* _build/html/plots/
 cp cheatsheet_files/* _build/html/cheatsheets/
+cp code_files/* _build/html/code/
 rsync -azP _build/html/ $target
