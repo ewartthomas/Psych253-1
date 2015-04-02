@@ -18,8 +18,22 @@ d1 = data.frame(cbind(c(d00), rep(1:15,3), rep(1:3, each=15)))
 colnames(d1) = c("rating","patient","replicate")
 d1$patient = factor(d1$patient)
 d1$replicate = factor(d1$replicate)			#Ignore 'replicate' as a factor
+str(d1)
+
+theme_set(theme_bw(base_size = 18)) 
+# set up basic data, with x and y vars
+p <- ggplot(d1, aes(patient, rating))
+p + geom_boxplot(fill= 'mediumseagreen', color= 'darkgreen') + 
+  labs(list(title = 'Patient Rating from 3 Raters', x = 'Patient', y='Rating')) +
+  # plot the points
+  geom_point(size=3,
+             colour="black", 
+             alpha = 0.5,
+             position=position_jitter(width=0.025))
+ggsave('~/Desktop/Calpha_smallerr.png', width = 10, height=6, dpi=300)
 #print(d1)
 #cat('\n')
+summary(d1)
 
 #Reverse order (D1,D2) pairs and find cor. Use ICC() to check.
 x1 = c(d0[,1], d0[,2]); y1 = c(d0[,2], d0[,1])
@@ -56,7 +70,7 @@ cat('\n')
 
 
 icc2 = ICC(d0)			#Ratings from all 3 replicates
-#print(icc2)
+print(icc2)
 cat("Whole sample ICC = ", icc2[[1]]$ICC[3])
 
 cat('\n','\n')
@@ -67,12 +81,18 @@ rs0 = lm(rating ~ patient, data=d1)		#note that 'replicates' is not a factor
 	#This fixed-effects model is not exactly right, but it gives the right F
 print(anova(rs0))
 
+(7.6309 - 1)/(7.6309+(3-1))
+
 cat('\n','\n')
 cat('Compute ICC from random effects ANOVA table')
 cat('ICC = var(p)/[var(p)+var(resid)]')
 cat('\n')
 rs1 = lmer(rating ~ (1 | patient), data=d1)	
-	#This random-effects model is the right model. Note that 'replicates' is not a factor
+#This random-effects model is the right model. Note that 'replicates' is not a facto
 
 print(summary(rs1))
+
+2.34/(2.34+1.06)
+
+
 sink(file=NULL,append=FALSE)

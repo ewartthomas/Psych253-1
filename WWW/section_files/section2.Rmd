@@ -1,0 +1,27 @@
+---
+title: 'Section 2: Reliability Continued'
+output:
+  html_document:
+    highlight: pygments
+    theme: flatly
+---
+
+It is often important to determine the reliability of a novel index. For instance, if you have some new RAs working in your lab coding images (e.g., judging the positive valence of each image), you probably want to determine the reliability of the raters, or in other words, the agreement between raters. Depending on the index you are using, there are several measure of reliability. Let's explore these different measures!
+
+
+### Calculate $\kappa$ using a Cognitive Model (HW1 #4)
+```{r}
+library(mcmc)
+# Load in appropriate functions
+source("http://stanford.edu/class/psych253/code/skapreliab2.r")
+
+dat0 = c(96,2,2,0) #EDIT THIS to contain the frequencies from the table in the problem
+cat(dat0, "\n Cohens kappa", kappa0(dat0), "\n")
+
+cat("\n Parameter estimates from (i) original data, (ii) the bootstrap \n\n") 
+print(param.boot3(dat0, 1000))
+
+cat("\n Parameter estimates using Bayesian model and MCMC \n\n") 
+print(param.mcmc1(dat0, 1000))
+```
+
