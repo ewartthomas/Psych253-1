@@ -1,0 +1,99 @@
+---
+title: "Estimating Reliability with Linear Models"
+output:
+  html_document:
+    highlight: pygments
+    theme: flatly
+---
+
+Introduction
+---------------------
+
+The goal of this tutorial is to provide a better intuition about the intraclass correlation coefficient (ICC) and Cronbach's $\alpha$ as measures of reliability. Specifically, we will give an example of ratings from two raters (per sample) that are correlated across samples, but not necessarily the most reliable. We'll show how estimates of reliability can be calculated using **1- and 2-way models** with either **random effects**, or **mixed effects**.
+
+Generate the dataset
+---------------------
+For this dataset, we'll have **2 raters per sample** (e.g., video clip), and there are **11 video clips** in total. When we calculate the reliability, it will matter if the same 2 raters rated each sample (2-way design), or if a different random sample of 2 raters rated each sample (1-way design).
+```{r fig.width=4, fig.height=4}
+library(psych)
+library(lme4)
+
+r1 = c(1,5,6,2,10,8,2)
+d_corr = cbind(r1=r1, r2=r1+4)
+d_corr[2,2] = 5
+cor(d_corr) # high correlation between these ratings!
+
+# Reformat for lmer analyses
+d00 = as.matrix(d_corr)
+d_corr1 = data.frame(cbind(c(d00), rep(1:7,2), rep(1:2, each=7)))
+colnames(d_corr1) = c("rating","clip","replicate")
+d_corr1$clip = factor(d_corr1$clip)
+d_corr1$replicate = factor(d_corr1$replicate)      #Ignore 'replicate' as a factor
+```
+
+Compute ICCs using R
+---------------------
+```{r}
+icc_res = ICC(d_corr); icc_res
+```
+
+
+Compute ICCs from models
+---------------------
+Now we'll use `lmer()` from `{lme4}` to compute reliability. Here, we can extract the variance attributed to the video clips, as well as the total variance (i.e., video clip variance + residual variance + any other variance), and use our formula to calculate ICC: $$ICC = \frac{Sample Variance}{Total Variance}$$
+
+### 1-way design
+In a 1-way design, each video clip is rated by a randomly chosen set of 2 raters. Again, ICC is defined as the fraction of total variance accounted for by variation across video clips. The more similar the raters scores within clips, the higher the ICC will be.
+
+To model this design, the video clips are seen as a random sample of clips, so we'll model a random intercept for the clips.
+
+```{r}
+rs1 = lmer(rating ~ (1 | clip), data=d_corr1)
+print(summary(rs1))
+```
+To calculate ICC, we take the variance from the clips, and divide it by the total variance (i.e., variance from clips + residual variance).
+```{r}
+8.524/(8.524+6.857)
+
+# Compare to ICC results
+icc_res[[1]]$ICC[1]
+```
+
+
+### 2-way designs
+In a 2-way design, each rater rates all the video clips (even if it is time consuming!). Here, we might **get our raters from a random sample**; if we do this, we can use a **random effects model** to model random effects of both video clips and raters, and we can generalize the results to other raters. On the other hand, we might **get our raters from a fixed sample** (e.g., from Supreme Court justices), and then we can use a **mixed effects model** to model random effects of video clips and fixed effects of raters; if we do this, we can't generalize our results to a larger population of raters.
+
+#### Raters from a random sample
+Let's start by assuming that we got our **raters from a random sample**:
+```{r}
+rs2 = lmer(rating ~ (1 | clip) + (1 | replicate), data=d_corr1)  
+print(summary(rs2))
+```
+
+To calculate ICC, we take the variance from the clips, and divide it by the total variance (i.e., variance from clips + residual variance + variance from our raters, which we can model since they each rated all the clips).
+```{r}
+11.381/(11.381+1.143+5.714)
+
+# Compare to ICC results
+icc_res[[1]]$ICC[2]
+```
+
+
+#### Raters from a fixed set
+Finally, let's assume that we got our raters from a **fixed set** (our Supreme Court justice raters), and model them as a **fixed effect**:
+```{r}
+rs1 = lmer(rating ~ replicate + (1 | clip), data=d_corr1)  
+print(summary(rs1))
+```
+
+Here, since we are modeling our raters as a fixed effect, our total variance only includes the variance from the video clips and residual variance. As a result, our denominator is slightly smaller than above, yielding a higher ICC.
+```{r}
+11.381/(11.381+1.143)
+
+# Compare to ICC results
+icc_res[[1]]$ICC[3]
+
+# Compare to correlation
+print(cor(d_corr))
+```
+Note that modeling the raters as a fixed effect produces very similar results to **Pearson's correlation**!

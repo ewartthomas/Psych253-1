@@ -18,8 +18,22 @@ d1 = data.frame(cbind(c(d00), rep(1:15,3), rep(1:3, each=15)))
 colnames(d1) = c("rating","patient","replicate")
 d1$patient = factor(d1$patient)
 d1$replicate = factor(d1$replicate)			#Ignore 'replicate' as a factor
+str(d1)
+
+theme_set(theme_bw(base_size = 18)) 
+# set up basic data, with x and y vars
+p <- ggplot(d1, aes(patient, rating))
+p + geom_boxplot(fill= 'mediumseagreen', color= 'darkgreen') + 
+  labs(list(title = 'Patient Rating from 3 Raters', x = 'Patient', y='Rating')) +
+  # plot the points
+  geom_point(size=3,
+             colour="black", 
+             alpha = 0.5,
+             position=position_jitter(width=0.025))
+ggsave('~/Desktop/Calpha_smallerr.png', width = 10, height=6, dpi=300)
 #print(d1)
 #cat('\n')
+summary(d1)
 
 #Reverse order (D1,D2) pairs and find cor. Use ICC() to check.
 x1 = c(d0[,1], d0[,2]); y1 = c(d0[,2], d0[,1])
@@ -54,9 +68,9 @@ cat('Average ICC over all pairs of reps, = ', icc1t)
 #icc1t should equal icc2, calculated immediately below
 cat('\n')
 
-
+str(d0)
 icc2 = ICC(d0)			#Ratings from all 3 replicates
-#print(icc2)
+print(icc2)
 cat("Whole sample ICC = ", icc2[[1]]$ICC[3])
 
 cat('\n','\n')
@@ -67,12 +81,54 @@ rs0 = lm(rating ~ patient, data=d1)		#note that 'replicates' is not a factor
 	#This fixed-effects model is not exactly right, but it gives the right F
 print(anova(rs0))
 
+(7.6309 - 1)/(7.6309+(3-1))
+
+r1 = c(1,5,6,2,10,8,2)
+d_corr = cbind(r1=r1, r2=r1+4)
+d_corr[2,2] = 5
+corrgram(d_corr)
+cor(d_corr)
+
+ICC(d_corr)
+d00 = as.matrix(d_corr)
+d_corr1 = data.frame(cbind(c(d00), rep(1:7,2), rep(1:2, each=7)))
+colnames(d_corr1) = c("rating","patient","replicate")
+d_corr1$patient = factor(d_corr1$patient)
+d_corr1$replicate = factor(d_corr1$replicate)  		#Ignore 'replicate' as a factor
+str(d_corr1)
+
+rs1 = lmer(rating ~ (1 | patient), data=d_corr1)  
+#This random-effects model is the right model. Note that 'replicates' is not a facto
+print(summary(rs1))
+8.524/(8.524+6.857)
+
+rs1 = lmer(rating ~ (1 | patient) + (1 | replicate), data=d_corr1)  
+print(summary(rs1))
+11.381/(11.381+1.143+5.714)
+
+rs1 = lmer(rating ~ replicate + (1 | patient), data=d_corr1)  
+print(summary(rs1))
+11.381/(11.381+1.143)
+
+
+
+
 cat('\n','\n')
 cat('Compute ICC from random effects ANOVA table')
 cat('ICC = var(p)/[var(p)+var(resid)]')
 cat('\n')
 rs1 = lmer(rating ~ (1 | patient), data=d1)	
-	#This random-effects model is the right model. Note that 'replicates' is not a factor
-
+#This random-effects model is the right model. Note that 'replicates' is not a facto
 print(summary(rs1))
+4.033/(4.033+1.094)
+
+rs1 = lmer(rating ~ (1 | patient) + (1 | replicate), data=d1)  
+print(summary(rs1))
+4.033/(4.033+1.094)
+
+rs1 = lmer(rating ~ replicate + (1 | patient), data=d1)  
+print(summary(rs1))
+4.010/(4.010+1.162)
+
+
 sink(file=NULL,append=FALSE)

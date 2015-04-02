@@ -8,6 +8,19 @@ some statistical concepts.
 Compiled by Steph Gagnon, Michael Waskom, and Lauren Howe
 
 
+Intraclass Correlation Coefficient
+---------------------------
+
+`Link to app <http://spark.rstudio.com/supsych/icc/>`_
+
+This example illustrates the relationship between variability in rater error
+and the reliability of the ratings, as assessed with the intraclass correlation
+coefficient (ICC). The ICC can be derived from models that are: 1-way random
+effects models (different random raters rate each question), 2-way random effects
+models (the same raters drawn, from a random sample, rate each question), or 2-way
+fixed effects models (the same raters, treated as the whole population of possible
+raters, rate each question).
+
 Sampling and standard error
 ---------------------------
 
@@ -111,5 +124,5 @@ Signal Detection Theory
 `Conceptual illustration <http://spark.rstudio.com/supsych/sdt_concept/>`_ /
 `Calculations from data <http://spark.rstudio.com/supsych/sdt_expt/>`_
 
-These applications illustrate the relationship between hit rate, false alarm rate, 
+These applications illustrate the relationship between hit rate, false alarm rate,
 dprime, and criterion.
