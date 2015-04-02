@@ -15,7 +15,7 @@ Lecture 2 (4/2):
 --------------------------------------------
 
 Reliability of quantitative scores. Overview of the intraclass correlation coefficient (ICC), 
-Cronbach's $\alpha$, test theory. 
+Cronbach's :math:`\alpha`, test theory. 
 [`PDF <http://www.stanford.edu/class/psych253/slides/ho-2-Reliability2_sg.pdf>`_]
 
 
