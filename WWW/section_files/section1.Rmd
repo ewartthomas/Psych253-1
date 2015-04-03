@@ -91,7 +91,7 @@ d0 = read.csv("http://stanford.edu/class/psych253/data/kappadata1.csv")
 str(d0)
 head(d0)
 ```
-Here, the columns `psych1` and `psych2` correspond to judge 1 and 2 ratings for experiment 1, and `psych3` and `psych4` correspond to judge 1 and 2 ratings for experiment 2. We want to know, how often do the judges agree on their ratings (i.e., put the same thing) vs. disagree (i.e., put different things)?
+Here, the columns `psych1` and `psych2` correspond to judge 1 and 2 ratings for experiment 1, and `psych3` and `psych4` correspond to judge 1 and 2 ratings for experiment 2. For each experiment the judges were clinicians, and they were diagnosing a sample of 100 patients as 1 (depressed) or 2 (not depressed). We want to know: how often do the judges (clinicians) agree on their ratings (i.e., put the same thing) vs. disagree (i.e., put different things)?
 
 Let's visualize the dataset quickly, to get a feel for what we're dealing with:
 ```{r fig.height=3, fig.width=3}
@@ -119,7 +119,7 @@ mtab12 = addmargins(ctab12) # this function makes it easy to calculate your marg
 mtab12
 ```
 
-Now we can calculate $\kappa$ as above, OR we can use an R function!
+Now we can calculate $\kappa$ as above, OR we can use an R function! Try calculating it by hand on your own. During section we'll calculate it using functions.
 
 #### Calculate Cohen's $\kappa$ with functions
 

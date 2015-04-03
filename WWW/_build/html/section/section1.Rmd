@@ -91,7 +91,7 @@ d0 = read.csv("http://stanford.edu/class/psych253/data/kappadata1.csv")
 str(d0)
 head(d0)
 ```
-Here, the columns `psych1` and `psych2` correspond to judge 1 and 2 ratings for experiment 1, and `psych3` and `psych4` correspond to judge 1 and 2 ratings for experiment 2. We want to know, how often do the judges agree on their ratings (i.e., put the same thing) vs. disagree (i.e., put different things)?
+Here, the columns `psych1` and `psych2` correspond to judge 1 and 2 ratings for experiment 1, and `psych3` and `psych4` correspond to judge 1 and 2 ratings for experiment 2. For each experiment the judges were clinicians, and they were diagnosing a sample of 100 patients as 1 (depressed) or 2 (not depressed). We want to know: how often do the judges (clinicians) agree on their ratings (i.e., put the same thing) vs. disagree (i.e., put different things)?
 
 Let's visualize the dataset quickly, to get a feel for what we're dealing with:
 ```{r fig.height=3, fig.width=3}
@@ -119,7 +119,7 @@ mtab12 = addmargins(ctab12) # this function makes it easy to calculate your marg
 mtab12
 ```
 
-Now we can calculate $\kappa$ as above, OR we can use an R function!
+Now we can calculate $\kappa$ as above, OR we can use an R function! Try calculating it by hand on your own. During section we'll calculate it using functions.
 
 #### Calculate Cohen's $\kappa$ with functions
 
@@ -217,12 +217,119 @@ You can do the same for the datasets `thought22.r` and `thought21.r`. As you do 
 
 Test Construction (HW-1 #4)
 ------------------------------
-```{r}
+
+When constructing a test (e.g., a scale to measure some psychological construct, such as trait anxiety), you often generate a bunch of different items (e.g., questions) that each subject will answer, and then you eventually average together the responses to all the items to arrive at one measure for each subject. In the example here, we have a test that has **9 items**, with scores from **68 subjects** for each item. Our **goal is to construct a better test consisting of a subset of the best items**.
 
 
+### Read in the data & look at it!
+```{r fig.width=6, fig.height=3}
+d1 = read.table('http://stanford.edu/class/psych253/data/hw1.4.txt')
 
+# Look at the dataframe
+str(d1)
+summary(d1)
+describe(d1, na.rm=T)
+
+boxplot(d1)
 ```
 
+**Visualize relationships between items** -- this can be helpful in identifying if any of the items might be *reverse coded* (e.g., if you have a scale measuring trait anxiety, you might want to throw in some items framed to be the opposite (outgoing, careless, etc.).
+```{r fig.height=6, fig.width=6}
+gpairs(d1, upper.pars = list(scatter = "lm", verbose = FALSE,
+                                       conditional = "barcode", 
+                                       mosaic = "mosaic"), 
+       lower.pars = list(scatter = "stats", 
+                         conditional = "boxplot", verbose = FALSE,
+                         mosaic = "mosaic"), 
+       stat.pars = list(fontsize = 14, signif = 0.05, 
+                        verbose = FALSE, use.color = TRUE, 
+                        missing = "missing", just = "centre"))
+```
+
+It appears that item 7, and possbly items 8 and 9 might be reverse coded.
+
+### Calculate Cronbach's $\alpha$ & item-total correls
+
+First, let's just check out Cronbach's $\alpha$ without reverse coding any items
+```{r}
+#Combine all 9 scores into 1 scale, without reverse coding any items.
+key1.list = list(all=c(1:9)); key1.list
+keys1 = make.keys(9, key1.list)
+
+res1 = scoreItems(keys1, d1)
+
+# Check out results
+print(res1$item.cor)  		#raw or uncorrected item-total correls
+print(res1$alpha)				#Cronbach's alpha
+
+# Compare to ICC alpha (ICC3k)
+ICC(d1)[[1]]$ICC[6]
+```
+
+#### Calculating Cronbach's $\alpha$ from `lmer()`
+Just for practice, let's calculate Cronbach's $\alpha$ from an `lmer()` model! Remember from lecture notes, to calculate the average ICCk, use this equation: $$\frac{k * ICC_{single}}{1 + (k - 1) * ICC_{single}}$$
+```{r}
+# Load in packages
+library(lme4)
+library(reshape2)
+
+# Reshape the dataframe to be long
+d1_long = d1
+d1_long$subject = c(1:68)
+d1_long = melt(d1_long, id.vars = 'subject')
+str(d1_long)
+
+# Mixed effects lmer, with random effect of "subject" (`subject`), and fixed effect for the "item" (`variable`)
+res = lmer(value ~ variable + (1|subject), data=d1_long)
+summary(res)
+
+# Calculate the single fixed ICC
+alpha = 0.4107/(0.4107+2.7287)
+
+# Now compute the average alpha
+alpha_k = (9 * alpha)/(1 + (9 - 1) * alpha); alpha_k
+```
+
+
+#### Reverse coding items
+What about if we just reverse code item 7?
+```{r fig.width=4, fig.height=4}
+#Combine all 9 scores into 1 scale, reverse coding item #7.
+key2.list = list(all=c(1:6, -7, 8,9))
+keys2 = make.keys(9, key2.list)
+res2 = scoreItems(keys2, d1)
+print(res2$item.cor)
+print(res2$alpha)
+
+#reverse code 7 manually
+max(d1) # scale goes from 1 - 10, max=10
+d1_rev7 = d1
+d1_rev7[,7] = (max(d1) + 1) - d1_rev7[,7]
+plot(d1[,7], d1_rev7[,7])
+
+res2b = scoreItems(keys1, d1_rev7)
+print(res2b$item.cor)
+print(res2b$alpha)
+# same results, just no negative sign in the correlations
+
+# ICC again to double check!
+ICC(d1_rev7)[[1]]$ICC[6]
+```
+If we reverse code 7, we improve reliability (i.e., increase Cronbach's $\alpha$). We might also try reversing items 8 and 9 too.
+
+### Calculate Cronbach's $\alpha$ for different constructs
+
+Now if we had designed this test on our own, we'd probably (hopefully!) have some hypotheses about what constructs each of the items measures. Let's imagine that we had 2 constructs to measure in this test, and items 1-4 measured one construct (e.g., introversion), and  items 7-9 measured another (e.g., conscientousness). We can specify that in our key list, and feed that directly to `scoreItems()` to test this!
+
+```{r}
+keys.list = list(construct0 = c(1:6,-7,-8,-9), first = 1:4, last=7:9)
+keys4 = make.keys(9, keys.list, item.labels=colnames(d1))
+res4 = scoreItems(keys4, d1)
+print(res4$item.cor)
+print(res4$alpha)
+```
+
+Here we can see that reverse coding 7-9 actually produces the highest reliability! However, items 7-9 on their own are not very reliable.
 
 
 Intraclass Correlation Coefficient (ICC)
