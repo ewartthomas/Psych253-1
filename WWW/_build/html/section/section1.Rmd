@@ -154,11 +154,23 @@ Cohen's $\kappa$ & Pearson's $r$
 In Study 3, 3 independent raters coded the same set of 100 stimuli (e.g., narratives) on whether each stimulus contained the idea or meaning of three categories, A, B, and C (e.g., family, health, money). 
 
 Let's start by looking at the reliability for raters 1 and 2 for category A (columns `ra1` and `ra2`).
-```{r}
+```{r fig.height=6, fig.width=6}
 # Subset dataframe to just look at study3
 study3 = d0[,5:13] 
 head(study3)
 
+# Visualize quickly
+gpairs(study3, upper.pars = list(scatter = "lm", verbose = FALSE,
+                                       conditional = "barcode", 
+                                       mosaic = "mosaic"), 
+       lower.pars = list(scatter = "stats", 
+                         conditional = "boxplot", verbose = FALSE,
+                         mosaic = "mosaic"), 
+       stat.pars = list(fontsize = 14, signif = 0.05, 
+                        verbose = FALSE, use.color = TRUE, 
+                        missing = "missing", just = "centre"))
+
+# Calcuate ra1-ra2 reliability
 kap = kappa2(d0[,c('ra1', 'ra2')]); kap
 ```
 Here, we can see that $\kappa$ = `r kap$value` is pretty low (<.2), so we can't even call it "fair."
