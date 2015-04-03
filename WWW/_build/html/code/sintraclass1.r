@@ -35,14 +35,23 @@ ggsave('~/Desktop/Calpha_smallerr.png', width = 10, height=6, dpi=300)
 #cat('\n')
 summary(d1)
 
+library(foreign)
+d3 = read.spss('~/Downloads/alpha.sav')
+str(d3)
+ICC(as.data.frame(d3))
+
 #Reverse order (D1,D2) pairs and find cor. Use ICC() to check.
 x1 = c(d0[,1], d0[,2]); y1 = c(d0[,2], d0[,1])
-icc0 = round(cor(x1, y1), 2)
+icc0 = round(cor(x1, y1), 4); icc0
+
+x1 = c(d0[,1]); y1 = c(d0[,2])
+round(cor(x1, y1), 4)
 cat('ICC12 as correl across 2n pairs = ', icc0)
 cat('\n')
 
 d01 = d0[,1:2]			#rep1, rep2 ratings
 icc1 = ICC(d01)
+icc1
 cat('ICC12, judges fixed,  = ', icc1[[1]]$ICC[3])
 #icc1[[1]]$ICC[3] should equal icc0!
 cat('\n')

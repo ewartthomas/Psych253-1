@@ -93,7 +93,7 @@ Here, since we are modeling our raters as a fixed effect, our total variance onl
 # Compare to ICC results
 icc_res[[1]]$ICC[3]
 
-# Compare to correlation
+# Compare to Pearson's correlation
 print(cor(d_corr))
 ```
 Note that modeling the raters as a fixed effect produces very similar results to **Pearson's correlation**!

@@ -31,10 +31,10 @@ addmargins(ratings)
 
 ### Calculate agreement between raters
 ```{r}
-agree = sum(diag(ratings))
+agree = sum(diag(ratings)); agree
 
 # total number of raters
-n = margin.table(ratings)
+n = margin.table(ratings); n
 
 # percent agreement
 agree_percent = agree/n
@@ -63,10 +63,10 @@ calc_chance = function(num_raters, table) {
   return(sum(temp))
 }
 
-chance_percent = calc_chance(2, ratings)
+chance_percent = calc_chance(2, ratings); chance_percent
 ```
 
-The percent agreement due to chance is `r chance_percent`.
+The percent agreement due to chance is `r round(chance_percent, 2)`.
 
 ### Calculate Cohen's $\kappa$
 ```{r}
@@ -75,10 +75,10 @@ calc_kappa = function(agree_percent, chance_percent){
   return(kappa)
 }
 
-kappa = calc_kappa(agree_percent, chance_percent)
+kappa = calc_kappa(agree_percent, chance_percent); kappa
 ```
 
-The reliability of the two raters is `r kappa`.
+The reliability of the two raters is `r round(kappa, 2)`.
 
 
 ### Calculate Cohen's $\kappa$ from raw scores
@@ -148,7 +148,8 @@ If we have more than 2 raters, we can use `cohen.kappa` (as done above), or we c
 k5 = kappam.light(d0[, c('psych1','psych2','psych3','psych4')]); k5
 ```
 
-
+Cohen's $\kappa$ & Pearson's $r$
+------------------------------
 ### Study 3 (HW1 #2)
 In Study 3, 3 independent raters coded the same set of 100 stimuli (e.g., narratives) on whether each stimulus contained the idea or meaning of three categories, A, B, and C (e.g., family, health, money). 
 
@@ -172,7 +173,7 @@ In a study on “The Effects of Source Certainty on Consumer Involvement and Per
 
 These indices (extent and valence of thought) are calculated in `thought11.r`. Raw data are in a 240 by 2 matrix, `thought12.r`. 
 
-#### Calculate reliability between raters 1 and 2 from raw data
+#### Calculate reliability between raters 1 and 2 from counts
 ```{r}
 # Load in data (use read.table, since this dataset is not in .csv form!)
 d1=read.table("http://stanford.edu/class/psych253/data/thought12.r") 
@@ -184,7 +185,7 @@ ctab1
 
 ckap1 = cohen.kappa(ctab1); ckap1
 
-# alternatively, use irr
+# alternatively, kappa2 from {irr}
 kappa2(d1[,c('rater.1', 'rater.2')])
 ```
 
@@ -211,16 +212,21 @@ qplot(extent.1, extent.2, data = d2,
       geom = c("point", "smooth"), method="lm") +theme_bw()
 ```
 
+You can do the same for the datasets `thought22.r` and `thought21.r`. As you do this, note that while the correlations change across datasets, Cohen's $\kappa$ remains unchanged. Why is this the case? When trying to understand why kappa didn't change but Pearson's $r$ did, think about how the two are calculated. What do you plug into the equations to compute each?
+
+
+Test Construction (HW-1 #4)
+------------------------------
+```{r}
+
+
+
+```
+
+
 
 Intraclass Correlation Coefficient (ICC)
 ------------------------------
 If the ratings are continuous in nature, we can assess reliability with the **intraclass correlation coefficient (ICC)**. Here, there are a few different kinds of designs we might have, that could effect the way we calculate reliability. For instance, we might have a **1-way design**, in which each item is rated by a randomly chosen set of $k$ raters. Or, we might have a **2-way design (with rater as a random effect)**, in which each item is rated by all $k$ raters, who are chosen randomly; here, since rater is a random effect, the reliability estimate generalizes to a population of raters. On the other hand, we could have a **2-way design (with rater as a fixed effect)**, in which a fixed set of $k$ judges rates all the items; in this case, rater is a fixed effect and thus the reliability estimates do NOT generalize.
 
-```{r}
-d3 = data.frame(cbind(video1=c(3, 4, 2), video2=c(6,5,7)))
-boxplot(d3)
-```
-
-Cronbach's $\alpha$
-------------------------------
-Cronbach's $\alpha$ is a measure of internal consistency for continuous items -- in other words, how closely a set of items are as a group. 
+Check out more in the tutorial [here](http://web.stanford.edu/class/psych253/tutorials/ICC_from_linearmodels.html), or the Shiny app [here](http://spark.rstudio.com/supsych/icc/)!

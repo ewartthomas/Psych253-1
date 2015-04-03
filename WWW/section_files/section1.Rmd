@@ -31,10 +31,10 @@ addmargins(ratings)
 
 ### Calculate agreement between raters
 ```{r}
-agree = sum(diag(ratings))
+agree = sum(diag(ratings)); agree
 
 # total number of raters
-n = margin.table(ratings)
+n = margin.table(ratings); n
 
 # percent agreement
 agree_percent = agree/n
@@ -63,10 +63,10 @@ calc_chance = function(num_raters, table) {
   return(sum(temp))
 }
 
-chance_percent = calc_chance(2, ratings)
+chance_percent = calc_chance(2, ratings); chance_percent
 ```
 
-The percent agreement due to chance is `r chance_percent`.
+The percent agreement due to chance is `r round(chance_percent, 2)`.
 
 ### Calculate Cohen's $\kappa$
 ```{r}
@@ -75,10 +75,10 @@ calc_kappa = function(agree_percent, chance_percent){
   return(kappa)
 }
 
-kappa = calc_kappa(agree_percent, chance_percent)
+kappa = calc_kappa(agree_percent, chance_percent); kappa
 ```
 
-The reliability of the two raters is `r kappa`.
+The reliability of the two raters is `r round(kappa, 2)`.
 
 
 ### Calculate Cohen's $\kappa$ from raw scores
@@ -148,7 +148,8 @@ If we have more than 2 raters, we can use `cohen.kappa` (as done above), or we c
 k5 = kappam.light(d0[, c('psych1','psych2','psych3','psych4')]); k5
 ```
 
-
+Cohen's $\kappa$ & Pearson's $r$
+------------------------------
 ### Study 3 (HW1 #2)
 In Study 3, 3 independent raters coded the same set of 100 stimuli (e.g., narratives) on whether each stimulus contained the idea or meaning of three categories, A, B, and C (e.g., family, health, money). 
 
@@ -172,7 +173,7 @@ In a study on “The Effects of Source Certainty on Consumer Involvement and Per
 
 These indices (extent and valence of thought) are calculated in `thought11.r`. Raw data are in a 240 by 2 matrix, `thought12.r`. 
 
-#### Calculate reliability between raters 1 and 2 from raw data
+#### Calculate reliability between raters 1 and 2 from counts
 ```{r}
 # Load in data (use read.table, since this dataset is not in .csv form!)
 d1=read.table("http://stanford.edu/class/psych253/data/thought12.r") 
@@ -184,7 +185,7 @@ ctab1
 
 ckap1 = cohen.kappa(ctab1); ckap1
 
-# alternatively, use irr
+# alternatively, kappa2 from {irr}
 kappa2(d1[,c('rater.1', 'rater.2')])
 ```
 
@@ -211,16 +212,128 @@ qplot(extent.1, extent.2, data = d2,
       geom = c("point", "smooth"), method="lm") +theme_bw()
 ```
 
+You can do the same for the datasets `thought22.r` and `thought21.r`. As you do this, note that while the correlations change across datasets, Cohen's $\kappa$ remains unchanged. Why is this the case? When trying to understand why kappa didn't change but Pearson's $r$ did, think about how the two are calculated. What do you plug into the equations to compute each?
+
+
+Test Construction (HW-1 #4)
+------------------------------
+
+When constructing a test (e.g., a scale to measure some psychological construct, such as trait anxiety), you often generate a bunch of different items (e.g., questions) that each subject will answer, and then you eventually average together the responses to all the items to arrive at one measure for each subject. In the example here, we have a test that has **9 items**, with scores from **68 subjects** for each item. Our **goal is to construct a better test consisting of a subset of the best items**.
+
+
+### Read in the data & look at it!
+```{r fig.width=6, fig.height=3}
+d1 = read.table('http://stanford.edu/class/psych253/data/hw1.4.txt')
+
+# Look at the dataframe
+str(d1)
+summary(d1)
+describe(d1, na.rm=T)
+
+boxplot(d1)
+```
+
+**Visualize relationships between items** -- this can be helpful in identifying if any of the items might be *reverse coded* (e.g., if you have a scale measuring trait anxiety, you might want to throw in some items framed to be the opposite (outgoing, careless, etc.).
+```{r fig.height=6, fig.width=6}
+gpairs(d1, upper.pars = list(scatter = "lm", verbose = FALSE,
+                                       conditional = "barcode", 
+                                       mosaic = "mosaic"), 
+       lower.pars = list(scatter = "stats", 
+                         conditional = "boxplot", verbose = FALSE,
+                         mosaic = "mosaic"), 
+       stat.pars = list(fontsize = 14, signif = 0.05, 
+                        verbose = FALSE, use.color = TRUE, 
+                        missing = "missing", just = "centre"))
+```
+
+It appears that item 7, and possbly items 8 and 9 might be reverse coded.
+
+### Calculate Cronbach's $\alpha$ & item-total correls
+
+First, let's just check out Cronbach's $\alpha$ without reverse coding any items
+```{r}
+#Combine all 9 scores into 1 scale, without reverse coding any items.
+key1.list = list(all=c(1:9)); key1.list
+keys1 = make.keys(9, key1.list)
+
+res1 = scoreItems(keys1, d1)
+
+# Check out results
+print(res1$item.cor)  		#raw or uncorrected item-total correls
+print(res1$alpha)				#Cronbach's alpha
+
+# Compare to ICC alpha (ICC3k)
+ICC(d1)[[1]]$ICC[6]
+```
+
+#### Calculating Cronbach's $\alpha$ from `lmer()`
+Just for practice, let's calculate Cronbach's $\alpha$ from an `lmer()` model! Remember from lecture notes, to calculate the average ICCk, use this equation: $$\frac{k * ICC_{single}}{1 + (k - 1) * ICC_{single}}$$
+```{r}
+# Load in packages
+library(lme4)
+library(reshape2)
+
+# Reshape the dataframe to be long
+d1_long = d1
+d1_long$subject = c(1:68)
+d1_long = melt(d1_long, id.vars = 'subject')
+str(d1_long)
+
+# Mixed effects lmer, with random effect of "subject" (`subject`), and fixed effect for the "item" (`variable`)
+res = lmer(value ~ variable + (1|subject), data=d1_long)
+summary(res)
+
+# Calculate the single fixed ICC
+alpha = 0.4107/(0.4107+2.7287)
+
+# Now compute the average alpha
+alpha_k = (9 * alpha)/(1 + (9 - 1) * alpha); alpha_k
+```
+
+
+#### Reverse coding items
+What about if we just reverse code item 7?
+```{r fig.width=4, fig.height=4}
+#Combine all 9 scores into 1 scale, reverse coding item #7.
+key2.list = list(all=c(1:6, -7, 8,9))
+keys2 = make.keys(9, key2.list)
+res2 = scoreItems(keys2, d1)
+print(res2$item.cor)
+print(res2$alpha)
+
+#reverse code 7 manually
+max(d1) # scale goes from 1 - 10, max=10
+d1_rev7 = d1
+d1_rev7[,7] = (max(d1) + 1) - d1_rev7[,7]
+plot(d1[,7], d1_rev7[,7])
+
+res2b = scoreItems(keys1, d1_rev7)
+print(res2b$item.cor)
+print(res2b$alpha)
+# same results, just no negative sign in the correlations
+
+# ICC again to double check!
+ICC(d1_rev7)[[1]]$ICC[6]
+```
+If we reverse code 7, we improve reliability (i.e., increase Cronbach's $\alpha$). We might also try reversing items 8 and 9 too.
+
+### Calculate Cronbach's $\alpha$ for different constructs
+
+Now if we had designed this test on our own, we'd probably (hopefully!) have some hypotheses about what constructs each of the items measures. Let's imagine that we had 2 constructs to measure in this test, and items 1-4 measured one construct (e.g., introversion), and  items 7-9 measured another (e.g., conscientousness). We can specify that in our key list, and feed that directly to `scoreItems()` to test this!
+
+```{r}
+keys.list = list(construct0 = c(1:6,-7,-8,-9), first = 1:4, last=7:9)
+keys4 = make.keys(9, keys.list, item.labels=colnames(d1))
+res4 = scoreItems(keys4, d1)
+print(res4$item.cor)
+print(res4$alpha)
+```
+
+Here we can see that reverse coding 7-9 actually produces the highest reliability! However, items 7-9 on their own are not very reliable.
+
 
 Intraclass Correlation Coefficient (ICC)
 ------------------------------
 If the ratings are continuous in nature, we can assess reliability with the **intraclass correlation coefficient (ICC)**. Here, there are a few different kinds of designs we might have, that could effect the way we calculate reliability. For instance, we might have a **1-way design**, in which each item is rated by a randomly chosen set of $k$ raters. Or, we might have a **2-way design (with rater as a random effect)**, in which each item is rated by all $k$ raters, who are chosen randomly; here, since rater is a random effect, the reliability estimate generalizes to a population of raters. On the other hand, we could have a **2-way design (with rater as a fixed effect)**, in which a fixed set of $k$ judges rates all the items; in this case, rater is a fixed effect and thus the reliability estimates do NOT generalize.
 
-```{r}
-d3 = data.frame(cbind(video1=c(3, 4, 2), video2=c(6,5,7)))
-boxplot(d3)
-```
-
-Cronbach's $\alpha$
-------------------------------
-Cronbach's $\alpha$ is a measure of internal consistency for continuous items -- in other words, how closely a set of items are as a group. 
+Check out more in the tutorial [here](http://web.stanford.edu/class/psych253/tutorials/ICC_from_linearmodels.html), or the Shiny app [here](http://spark.rstudio.com/supsych/icc/)!
