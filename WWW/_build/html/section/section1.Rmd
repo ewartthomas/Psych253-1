@@ -293,14 +293,21 @@ d1_long = melt(d1_long, id.vars = 'subject')
 str(d1_long)
 
 # Mixed effects lmer, with random effect of "subject" (`subject`), and fixed effect for the "item" (`variable`)
+d1_long$subject=factor(d1_long$subject)
 res = lmer(value ~ variable + (1|subject), data=d1_long)
 summary(res)
 
 # Calculate the single fixed ICC
-alpha = 0.4107/(0.4107+2.7287)
+alpha = 0.4107/(0.4107+2.7287); alpha
 
 # Now compute the average alpha
 alpha_k = (9 * alpha)/(1 + (9 - 1) * alpha); alpha_k
+
+
+anova(lm(value ~ variable + subject, data=d1_long))
+(Fs - 1)/(Fs + k - 1)
+ncol(d1_long)
+(2.3546-1)/(2.3546 + 9-1)
 ```
 
 
