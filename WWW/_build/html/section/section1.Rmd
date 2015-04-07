@@ -24,6 +24,7 @@ ratings <- matrix(c(20, 4, 8, 11),ncol=2,byrow=TRUE)
 colnames(ratings) <- c("rater2_n", "rater2_y")
 rownames(ratings) <- c("rater1_n", "rater1_y")
 ratings <- as.table(ratings)
+ratings
 
 # Display table with margins (row/col sums)
 addmargins(ratings)
@@ -41,7 +42,7 @@ agree_percent = agree/n
 cat('Percent agreement:', agree_percent)
 ```
 
-The percent agreement between raters is `r agree_percent`.
+The percent agreement between raters is `r round(agree_percent,2)`.
 
 
 ### Calculate level of agreement due to chance

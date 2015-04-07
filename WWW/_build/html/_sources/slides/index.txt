@@ -19,3 +19,8 @@ Cronbach's :math:`\alpha`, test theory.
 [`PDF <http://www.stanford.edu/class/psych253/slides/ho-2-Reliability2_sg.pdf>`_]
 
 
+Lecture 3 (4/8): 
+--------------------------------------------
+
+Using Cognitive Models to estimate reliability; theory-based approaches to reliability. 
+[`PDF <http://www.stanford.edu/class/psych253/slides/ho-2-reliability3.pdf>`_]
