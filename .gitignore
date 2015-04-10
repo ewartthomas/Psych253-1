@@ -1,5 +1,6 @@
 # History files
 .Rhistory
+.DS_Store
 
 # Example code in package build process
 *-Ex.R
@@ -10,3 +11,6 @@
 # RStudio files
 .Rproj.user/
 powerpoints
+/WWW/.DS_Store
+/WWW/code_files/.DS_Store
+/WWW/section_files/.DS_Store
