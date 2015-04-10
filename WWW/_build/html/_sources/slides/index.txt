@@ -27,4 +27,5 @@ Using Cognitive Models to estimate reliability; theory-based approaches to relia
 
 Lecture 4 (4/9):
 --------------------------------------------
-[`PDF <http://www.stanford.edu/class/psych253/slides/ho-2-reliability4.pdf>`_]
+Theory based approaches to reliability. Relating test-retest reliability to causal models;
+attentuation of reliability. [`PDF <http://www.stanford.edu/class/psych253/slides/ho-2-reliability4.pdf>`_]

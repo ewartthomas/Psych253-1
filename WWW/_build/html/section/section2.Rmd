@@ -1,27 +1,396 @@
 ---
-title: 'Section 2: Reliability Continued'
+title: 'Section 2: Cannot get enough Reliability'
 output:
   html_document:
     highlight: pygments
     theme: flatly
+    toc: true
+    toc_depth: 2 
 ---
 
-It is often important to determine the reliability of a novel index. For instance, if you have some new RAs working in your lab coding images (e.g., judging the positive valence of each image), you probably want to determine the reliability of the raters, or in other words, the agreement between raters. Depending on the index you are using, there are several measure of reliability. Let's explore these different measures!
+`r require(knitr)`
+`r opts_chunk$set(cache = TRUE)`
 
+```{r echo=FALSE, include=FALSE}
+library(irr)
+library(psych)
+library(gpairs)
+library(ggplot2)
+library(reshape2)
+library(lme4)
+library(mcmc) # Make sure you have this package installed!
 
-### Calculate $\kappa$ using a Cognitive Model (HW1 #4)
-```{r}
-library(mcmc)
-# Load in appropriate functions
-source("http://stanford.edu/class/psych253/code/skapreliab2.r")
-
-dat0 = c(96,2,2,0) #EDIT THIS to contain the frequencies from the table in the problem
-cat(dat0, "\n Cohens kappa", kappa0(dat0), "\n")
-
-cat("\n Parameter estimates from (i) original data, (ii) the bootstrap \n\n") 
-print(param.boot3(dat0, 1000))
-
-cat("\n Parameter estimates using Bayesian model and MCMC \n\n") 
-print(param.mcmc1(dat0, 1000))
+#Set this to the directory where you want to knit this document
+#setwd('~/Desktop/psych253/Psych253/WWW/section_files/')
 ```
+
+
+## Calculate $\kappa$ using a Cognitive Model (HW2 #3)
+
+First, let's get some context. To the slides!  
+
+Ewarts Cognitive Model AKA DECIDATRON 3000 AKA Ole' Reliable AKA....
+```{r}
+
+####FUNCTIONS ###
+loglik2 = function(th, dat) {  # dat = (n11,n12,n21,n22); compute -log(likelihood) for minimisation in nlminb()
+  p0 = th[1]; w1 = th[2]; w2 = th[3]
+	p11 = .25*((1 - w1)*(1 - w2)) + .5*p0*(w1 + w2)
+	p12 = .25*((1 - w1)*(1 + w2)) + .5*p0*(w1 - w2)
+	p21 = .25*((1 - w2)*(1 + w1)) + .5*p0*(w2 - w1)
+	p22 = .25*((1 - w1)*(1 - w2)) + .5*(1 - p0)*(w1 + w2)
+	-(dat[1]*log(p11) + dat[2]*log(p12) + dat[3]*log(p21) + dat[4]*log(p22) )
+}
+
+param.boot1 = function(data) {	# data = (n11,n12,n21,n22); est kappa and ML estimate of theta
+	rs0 = kappa0(data)			# Calculate Cohen's kappa
+	rs00 = nlminb(start=c(0.5,0.5,0.5), loglik2, dat = data, lower=c(0,0,0), upper=c(1,1,1))$par  # ML theta
+	rs1 = c(rs00, rs0)
+	names(rs1) = c("p","w1","w2","kappa")
+	round(rs1, 4)
+}
+
+param.boot2 = function(data) {	# data = (n11,n12,n21,n22); take random multinomial sample, get ML est of theta
+	n0 = sum(data)
+	dat1 = c(rmultinom(1, n0, data))	# take a multinomial sample from data of same size
+	rs0 = kappa0(dat1)
+	rs00 = nlminb(start=c(0.5,0.5,0.5), loglik2, dat = dat1, lower=c(0,0,0), upper=c(1,1,1))$par
+	rs1 = c(rs00, rs0)
+	names(rs1) = c("p","w1","w2","kappa")
+	round(rs1, 4)
+}
+
+boot.summary1 = function(vec) {	# calculate summary statistics for bootstrapped sample of each param
+	rs1 = quantile(vec, c(.025, .5, .975), na.rm = T)
+  #rs2 = c(mean(vec, na.rm = T), sd(vec, na.rm = T))
+	rs2 = c(mean(vec, na.rm = T), sd(vec, na.rm = T))
+	rs3 = c(rs2[1], rs1[2], rs2[2], rs1[c(1,3)])
+	round(rs3, 4)
+}
+
+param.boot3 = function(data, R) { # get summary statistics for original and bootstrapped samples
+	rs0 = array(dim = c(R, 4))
+	rs2 = list(length = 2)
+	rs2[[1]] = param.boot1(data)
+	
+	for (i in 1:R) {			# Use of a for() loop is inefficient; better to use {boot} package
+		rs0[i,] = param.boot2(data)
+		}
+	rs3 = apply(rs0, 2, boot.summary1)
+	rs3 = t(rs3)
+	rownames(rs3) = c("p", "w1", "w2", "kappa")
+	colnames(rs3) = c("mean", "median", "se", "q.025", "q.975")
+	rs2[[2]] = rs3
+	rs2
+}
+
+## The next function calculates the log (without the minus sign!) of the unnormalised posterior probability distribution
+## of the parameters (p0, w1 and w2), given the data.  In this Bayesian approach, it is assumed that the prior
+## distrn of the parameters is the Uniform distrn on (0, 1).  With this simplifying assn, the posterior likelihood
+## of the params, given the data, is proportional to the likelihood of the data, given the params.
+## Because of this proportionality, the posterior mode falls at the same parameter values that maximise the 
+## likelihood function.  That is, the ML estimates are equal to the posterior mode.  If, as is expected, the mode
+## is close to the mean and median of the posterior distrn, the ML estimates shd be close to
+## the (Bayesian) posterior mean.  In sum, the ML and Bayesian approaches shd yield similar results.
+## Bayesian estimation is done by MCMC sampling, using the Metropolis algorithm in the package, {mcmc}
+
+library(mcmc)
+
+loglikmc1 = function(logth, dat) {  #dat = (n11,n12,n21,n22); use logit(th) as parameters, for convenience
+	th = exp(logth)/(1 + exp(logth))
+	p0 = th[1]; w1 = th[2]; w2 = th[3]
+	p11 = .25*((1 - w1)*(1 - w2)) + .5*p0*(w1 + w2)
+	p12 = .25*((1 - w1)*(1 + w2)) + .5*p0*(w1 - w2)
+	p21 = .25*((1 - w2)*(1 + w1)) + .5*p0*(w2 - w1)
+	p22 = .25*((1 - w1)*(1 - w2)) + .5*(1 - p0)*(w1 + w2)
+	(dat[1]*log(p11) + dat[2]*log(p12) + dat[3]*log(p21) + dat[4]*log(p22) )
+}
+
+param.mcmc1 = function(data, R) { # Bayesian estimates using MCMC
+  #data = girls_tab; R=1000 # for testing
+	rs1 = metrop(loglikmc1, rep(0, 3), nbatch = R, dat = data)		# MCMC sampling with Metropolis algorithm
+	rs2 = apply(rs1$batch, 2, boot.summary1)						# Extract summary statistics from MCMC chains
+	rs2 = t(rs2)
+	rs3 = round(exp(rs2)/(1 + exp(rs2)), 4)							# Transform from logit to probability scale
+	rownames(rs3) = c("p", "w1", "w2")
+	colnames(rs3) = c("mean", "median", "se", "q.025", "q.975")
+	rs3
+}
+
+kappa0 = function(dat) {  # compute Cohen's kappa from dat = (n11,n12,n21,n22)
+	pa1 = (dat[1] + dat[4])/sum(dat)
+	pc1 = ((dat[1] + dat[2])/sum(dat)) * ((dat[1] + dat[3])/sum(dat)) + ((dat[4] + dat[2])/sum(dat)) * ((dat[4] + dat[3])/sum(dat))
+	round((pa1 - pc1)/(1 - pc1), 4)
+}
+#####END FUNCTIONS ####
+```
+
+Lets Make some Data! This is a usefull exercise to uncover the underlying quantities we care about. 
+
+Sensitivity---> w
+Base Rate ----> p
+
+Not considered:
+Bias/perceived base rate
+
+```{r}
+make_gs_data <- function(p, length){
+  sample(c(0,1), length, replace = TRUE, prob=c(1-p,p))
+}
+
+make_gs_data_det <- function(p, length){
+  rep(0:1, c(100*(1-p),100*p))
+}
+
+
+
+make_rater <- function(data, w){
+  sapply(data, function(x){
+                perceive = sample(c(0,1), 1, replace = TRUE, prob=c(1-w,w))
+                if(perceive){
+                  return(x)
+                }
+                else{
+                  return(sample(c(1-x,x), 1, replace = TRUE, prob=c(.5,.5)))
+                }
+            })    
+}
+
+gs_data <- make_gs_data(.8,100)
+perfect_rater <- make_rater(gs_data,1)
+eyes_closed_rater <- make_rater(gs_data,0)
+just_okay_rater <- make_rater(gs_data,.5)
+
+mean((gs_data == perfect_rater) * 100)
+mean((gs_data==eyes_closed_rater) * 100)
+mean((gs_data==just_okay_rater) * 100)
+```
+
+
+Let's make some data and test our model with known targets
+
+```{r}
+gs_data <- make_gs_data_det(.4,100)
+mean(gs_data)
+
+moderate_rater <- make_rater(gs_data, .2) # R1
+good_rater  <- make_rater(gs_data, .9) # R2
+
+xtab <- table(good_rater,moderate_rater);xtab
+
+num_iter = 1000
+param.boot3(xtab, num_iter)
+param.mcmc1(xtab, num_iter)
+```
+
+
+
+```{r}
+gs_data <- make_gs_data(.2,100)
+mean(gs_data)
+
+bad_rater1 <- make_rater(gs_data, .4) # R1
+bad_rater2 <- make_rater(gs_data, .4) # R2
+
+xtab <- table(bad_rater1, bad_rater2)
+
+num_iter = 1000
+param.boot3(xtab, num_iter)
+param.mcmc1(xtab, num_iter)
+
+```
+
+
+
+Permit stronger inferences
+```{r}
+dj_param.boot2 = function(data, p) {	# data = (n11,n12,n21,n22); take random multinomial sample, get ML est of theta
+	n0 = sum(data)
+	dat1 = c(rmultinom(1, n0, data))	# take a multinomial sample from data of same size
+	rs0 = kappa0(dat1)
+	rs00 = nlminb(start=c(p, 0.5,0.5), loglik2, dat = dat1, lower=c(p,0,0), upper=c(p,1,1))$par
+	rs1 = c(rs00, rs0)
+	names(rs1) = c("p","w1","w2","kappa")
+	round(rs1, 4)
+}
+
+dj_boot.summary1 = function(vec) {	# calculate summary statistics for bootstrapped sample of each param
+	rs1 = quantile(vec, c(.025, .5, .975), na.rm = T)
+  #rs2 = c(mean(vec, na.rm = T), sd(vec, na.rm = T))
+	rs2 = c(mean(vec, na.rm = T), sd(vec, na.rm = T))
+	rs3 = c(rs2[1], rs1[2], rs2[2], rs1[c(1,3)])
+	round(rs3, 4)
+}
+
+dj_param.boot3 = function(data,p,R) { # get summary statistics for original and bootstrapped samples
+	rs0 = array(dim = c(R, 4))
+	rs2 = list(length = 2)
+	rs2[[1]] = param.boot1(data)
+	
+	for (i in 1:R) {			# Use of a for() loop is inefficient; better to use {boot} package
+		rs0[i,] = dj_param.boot2(data,p)
+		}
+	rs3 = apply(rs0, 2, dj_boot.summary1)
+	rs3 = t(rs3)
+	rownames(rs3) = c("p", "w1", "w2", "kappa")
+	colnames(rs3) = c("mean", "median", "se", "q.025", "q.975")
+	rs2[[2]] = rs3
+	rs2
+}
+```
+
+
+```{r}
+gs_data <- make_gs_data_det(.4,100)
+mean(gs_data)
+
+moderate_rater <- make_rater(gs_data, .2) # R1
+good_rater  <- make_rater(gs_data, .9) # R2
+
+xtab <- table(good_rater,moderate_rater);xtab
+
+num_iter = 1000
+#param.boot3(xtab, num_iter)
+#param.mcmc1(xtab, num_iter)
+
+dj_param.boot3(xtab, .6, num_iter)
+param.boot3(xtab, num_iter)
+```
+
+
+
+Let's look at how kappa changes with the underlying probability of an event
+```{r}
+## The next section is NOT needed for HW-1. It uses boot() for efficient bootstrapping.  To use boot(), we need to
+## (a) format the data as the vector of responses on each trial, not the crosstabs.
+## Response 1 on a trial means both raters choose '1', 2 means R1 chose '1', R2 chose '2', 
+## 3 means R1 chose '2', R2 chose '1', and Response 4 on a trial means both raters choose '2'. 
+## d.long1() does the re-formatting.
+## (b) define the function that generates the statistics from the data. This is param.boot0()
+
+library(boot)
+
+cat("\n\n Bootstrap Statistics obtained with boot and boot.ci from {boot} \n")
+
+d.long1 = function(d) { # d = (n11,n12,n21,n22); expand into long form, 1,1,...,2,...,4,4
+  c(rep(1, d[1]), rep(2, d[2]), rep(3, d[3]), rep(4, d[4]))
+}
+
+param.boot0 = function(dl, i) {	# dl = (1,1,...,4); sample from dl with index i, get kappa and ML est of theta
+	d1 = c(sum(dl[i] == 1), sum(dl[i] == 2), sum(dl[i] == 3), sum(dl[i] == 4))
+	rs0 = kappa0(d1)
+	rs00 = nlminb(start=c(0.5,0.5,0.5), loglik2, dat = d1, lower=c(0,0,0), upper=c(1,1,1))$par
+	rs1 = c(rs00, rs0)
+	names(rs1) = c("p","w1","w2","kappa")
+	round(rs1, 4)
+}
+
+d0 = c(14,4,5,210)
+dl0 = d.long1(d0)
+
+res1 = boot(dl0, param.boot0, R = 1000)
+
+# To get conf int for each parameter, use boot.ci, with index=1 (for p), index=2 (for w1), ...
+par.index = c("p", "w1", "w2", "kappa")
+
+for (j in 1:4) {
+	rs1 = boot.ci(res1, index = j, conf = .95, type = "perc") 
+	cat("\n\n Parameter is ", par.index[j], "\n")
+	print(rs1)
+}
+
+cat("\n\n Bootstrap Statistics \n")
+print(res1)
+
+
+## The next section also is NOT needed for HW-1. It simulates data for varying p = .1, .3, .5; w1 = .8, w2 = .9; N = 100, 200
+## For each data set, estimate params and kappa.  does kappa change as p changes, but not w1, w2?
+
+crosstab1 = function(th) {	# th = c(p, w1, w2)
+	p0 = th[1]; w1 = th[2]; w2 = th[3]
+	p11 = .25*((1 - w1)*(1 - w2)) + .5*p0*(w1 + w2)
+	p12 = .25*((1 - w1)*(1 + w2)) + .5*p0*(w1 - w2)
+	p21 = .25*((1 - w2)*(1 + w1)) + .5*p0*(w2 - w1)
+	p22 = .25*((1 - w1)*(1 - w2)) + .5*(1 - p0)*(w1 + w2)
+	c(p11, p12, p21, p22)
+}
+
+p00 = c(.1, .3, .5)
+c00 = array(dim = c(6, 4))
+for (i in 1:3) {
+	c11 = crosstab1(c(p00[i], .8, .7))
+	c00[2*i-1,] = tabulate(sample(4, 200, replace = T, c11))
+	c00[2*i,] = tabulate(sample(4, 400, replace = T, c11))
+}
+
+param.boot2 = function(data) {	# data = (n11,n12,n21,n22); take random multinomial sample, get ML est of theta
+	n0 = sum(data)
+	dat1 = c(rmultinom(1, n0, data))	# take a multinomial sample from data, of same size as data
+	rs0 = kappa0(dat1)
+	rs00 = nlminb(start=c(0.5,0.5,0.5), loglik2, dat = dat1, lower=c(0,0,0), upper=c(1,1,1))$par
+	rs1 = c(rs00, rs0)
+	names(rs1) = c("p","w1","w2","kappa")
+	round(rs1, 4)
+}
+
+
+th00 = array(dim = c(6, 4))
+colnames(th00) = c("p","w1","w2","kappa")
+for (i in 1:6) {
+	dati = c00[i,]
+	th00[i,] = param.boot2(dati)
+}
+
+print(th00)
+
+
+```
+
+
+## See how prior certainty effects reliability estimates with cogntive model 7.3 (HW2 #4)
+
+
+<img src="http://www.ntrand.com/images/functions/plot/plotBeta.jpg">
+
+```{r}
+source("http://stanford.edu/class/psych253/code/skapreliab2s.r")
+
+
+joint.dist1 = function(p, w, g) {  # generate joint freqs, given parameter values
+  p11 = p*(w + g*(1-w))
+	p12 = p*(1-g)*(1-w)
+	p21 = (1-p)*(1-w)*g
+	p22 = (1-p)*(w + (1-w)*(1-g))
+	round(200*c(p11, p12, p21, p22))
+}
+
+d0 = joint.dist1(.3, .8, .3) + c(2, 2, -1, -3)	# Data = exp freqs plus noise
+d1 = joint.dist1(.5, .8, .4) + c(2, 2, -1, -3)	# Data = exp freqs plus noise
+
+
+cat("\n Joint freqs, sample 1 ", d0, "\n")
+cat("\n Joint freqs, sample 2 ", d1, "\n")
+
+cat("\n Parameter estimates for p = .3, w = .8, g = .3; a = .1 \n\n") 
+print(param.boot3(d0, 1000, .1))
+
+cat("\n Parameter estimates for p = .3, w = .8, g = .3; a = 1 \n\n") 
+print(param.boot3(d0, 1000, 1))
+
+cat("\n Parameter estimates for p = .3, w = .8, g = .3; a = 4 \n\n") 
+print(param.boot3(d0, 1000, 4))
+
+cat("\n Parameter estimates for p = .3, w = .8, g = .3; a = 10 \n\n") 
+print(param.boot3(d0, 1000, 10))
+
+# Girls' joint distrn is d0, Boys' joint distrn is d1. Discuss similarities & diffs
+
+cat("\n Parameter estimates, sample 2; a = .10 \n\n") 
+print(param.boot3(d1, 1000, .10))
+
+cat("\n Parameter estimates, sample 2; a = 10 \n\n") 
+print(param.boot3(d1, 1000, 10))
+```
+
+
 
